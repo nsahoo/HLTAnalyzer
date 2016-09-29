@@ -332,7 +332,7 @@ iSetup)
             
             if(trk.numberOfValidHits()<nHit_offline_) continue;
             
-            if(!(trk.algo()==4 || trk.algo()==5 || trk.algo()==6 || trk.algo()==7 || trk.algo()==8 || trk.algo()==11)) continue;
+            if(!(trk.algo()==4 || trk.algo()==5 || trk.algo()==6 || trk.algo()==7 || trk.algo()==8 || trk.algo()==9 || trk.algo()==10 || trk.algo()==11)) continue;
             
             if(trk.pt()>OfflineLeadingPt) OfflineLeadingPt = trk.pt();
         }
@@ -389,7 +389,7 @@ iSetup)
     HLTVtxX = -999;
     HLTVtxY = -999;
     HLTVtxZ = -999;
-    NvtxHLT = -1;
+    NvtxOffline = -1;
     int   nmax_full = 0;
     double HLTVtxXerr = -999;
     double HLTVtxYerr = -999;
@@ -402,7 +402,7 @@ iSetup)
     {
         const reco::VertexCollection * vertices = vertexCollectionFull.product();
         int nvertices_full = vertices->size();
-        NvtxHLT = nvertices_full;
+        NvtxOffline = nvertices_full;
         if (nvertices_full!=0)
         {
             reco::VertexCollection::const_iterator verticesItr;
