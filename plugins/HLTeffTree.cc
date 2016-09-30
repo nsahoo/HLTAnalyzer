@@ -266,6 +266,7 @@ iSetup)
     double bestvz=0, bestvx=-999.9, bestvy=-999.9;
     double bestvzError=-999.9, bestvxError=-999.9, bestvyError=-999.9;
     NvtxOffline = -1;
+    NvtxTrkOffline = -1;
 
     if(vertices.isValid())
     {
@@ -284,7 +285,6 @@ iSetup)
     
     //ntrk offline
     Ntrkoffline = -1;
-    NvtxTrkOffline = -1;
     OfflineLeadingPt = -1;
     
     if(recotracks.isValid())
@@ -389,7 +389,7 @@ iSetup)
     HLTVtxX = -999;
     HLTVtxY = -999;
     HLTVtxZ = -999;
-    NvtxOffline = -1;
+    NvtxHLT = -1;
     int   nmax_full = 0;
     double HLTVtxXerr = -999;
     double HLTVtxYerr = -999;
@@ -402,7 +402,7 @@ iSetup)
     {
         const reco::VertexCollection * vertices = vertexCollectionFull.product();
         int nvertices_full = vertices->size();
-        NvtxOffline = nvertices_full;
+        NvtxHLT = nvertices_full;
         if (nvertices_full!=0)
         {
             reco::VertexCollection::const_iterator verticesItr;
