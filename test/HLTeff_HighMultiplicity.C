@@ -24,12 +24,12 @@ void HLTeff_HighMultiplicity()
     int NMult = 5;
     //Triggre combination, index corresponds to above array
     int indexMult[5] = {0,1,2,3,4};
-    int indexTowerCount[5] = {0,0,0,1,1};
+    int indexTowerCount[5] = {0,0,1,2,2};
     int Nindex = 5;
     
     //initialize eff plots
     int Nplot = 2+5*2;
-    TH1D* h = new TH1D("","",400,0,400);
+    TH1D* h = new TH1D("","",80,0,400);
     TH1D* hFull = h.Clone();
     TH1D* hMult[100];
     TH1D* hTowerCount[100];
@@ -58,11 +58,13 @@ void HLTeff_HighMultiplicity()
     int NtrkFull;
     double TowerCount;
     double OfflineVtxZ;
+    double HLTVtxZ;
     
     Tree->SetBranchAddress("Ntrkoffline",&Ntrkoffline);
     Tree->SetBranchAddress("NtrkFull",&NtrkFull);
     Tree->SetBranchAddress("TowerCount",&TowerCount);
     Tree->SetBranchAddress("OfflineVtxZ",&OfflineVtxZ);
+    Tree->SetBranchAddress("HLTVtxZ",&HLTVtxZ);
     
     //loop for histograms
     int nentry = Tree->GetEntries();
@@ -79,16 +81,19 @@ void HLTeff_HighMultiplicity()
         //fill Ntrkoffline distribution with cuts
         for(int i=0;i<NTC;i++)
         {
+            if(fabs(HLTVtxZ)>15) continue;
             if(TowerCount<=TowerCountThreshold[i]) continue;
             hTowerCount[i]->Fill(Ntrkoffline);
         }
         for(int j=0;j<NMult;j++)
         {
+            if(fabs(HLTVtxZ)>15) continue;
             if(NtrkFull<MultiplicityThreshold[j]) continue;
             hMult[j]->Fill(Ntrkoffline);
         }
         for(int k=0;k<Nindex;k++)
         {
+            if(fabs(HLTVtxZ)>15) continue;
             if(TowerCount<=TowerCountThreshold[indexTowerCount[k]]) continue;
             if(NtrkFull<MultiplicityThreshold[indexMult[k]]) continue;
             hAll[k]->Fill(Ntrkoffline);

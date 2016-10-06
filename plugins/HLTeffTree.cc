@@ -70,6 +70,7 @@
 #include "DataFormats/L1Trigger/interface/Tau.h"
 #include "DataFormats/L1Trigger/interface/Jet.h"
 #include "DataFormats/L1Trigger/interface/EtSum.h"
+#include <DataFormats/METReco/interface/CaloMET.h>
 
 #include <Math/Functions.h>
 #include <Math/SVector.h>
@@ -98,6 +99,9 @@ private:
     
     TTree* HLTeffTree;
    
+    int           HLT_Run;
+    ULong64_t     HLT_Event;
+    int           HLT_LumiBlock;
     //Tree info
     int Ntrkoffline;
     int NtrkFull;
@@ -115,6 +119,7 @@ private:
     int NvtxHLT;
     double OfflineLeadingPt;
     double HLTLeadingPt;
+    double HFsumET;
     
     //cuts for HighMultiplicity
     double min_Pt_; // min pt cut for number of tracks at HLT
@@ -151,6 +156,7 @@ private:
     edm::EDGetTokenT<reco::TrackCollection> tok_HLTTrk_;
     
     edm::EDGetTokenT<l1t::EtSumBxCollection> tok_EtSum_Stage2_;
+    edm::EDGetTokenT<reco::CaloMETCollection> tok_HFSum_;
 };
 
 //
@@ -214,6 +220,7 @@ HLTTree::HLTTree(const edm::ParameterSet& iConfig)
     tok_HLTTrk_ = consumes<reco::TrackCollection>(HLTTrack_);
     
     tok_EtSum_Stage2_ = consumes<l1t::EtSumBxCollection>(edm::InputTag("hltCaloStage2Digis","EtSum"));
+    tok_HFSum_ = consumes<reco::CaloMETCollection>(edm::InputTag("hltMetForHf"));
 }
 
 
@@ -237,6 +244,10 @@ iSetup)
 {
     using std::vector;
     using namespace edm;
+    
+    HLT_Run   = iEvent.id().run();
+    HLT_Event   = iEvent.id().event();
+    HLT_LumiBlock = iEvent.luminosityBlock();
     
     edm::Handle<reco::VertexCollection> vertices;
     iEvent.getByToken(tok_offlinePV_,vertices);
@@ -262,6 +273,9 @@ iSetup)
     edm::Handle<l1t::EtSumBxCollection> L1EtSum;
     iEvent.getByToken(tok_EtSum_Stage2_, L1EtSum);
     
+    Handle<reco::CaloMETCollection> missingET;
+    iEvent.getByToken(tok_HFSum_,missingET);
+    
     //reco vtx
     double bestvz=0, bestvx=-999.9, bestvy=-999.9;
     double bestvzError=-999.9, bestvxError=-999.9, bestvyError=-999.9;
@@ -284,7 +298,7 @@ iSetup)
     //if(bestvz < -15.0 || bestvz>15.0) return;
     
     //ntrk offline
-    Ntrkoffline = -1;
+    Ntrkoffline = 0;
     OfflineLeadingPt = -1;
     
     if(recotracks.isValid())
@@ -339,7 +353,7 @@ iSetup)
     }
 
     //ntrk online pixel
-    NtrkPixel = -1;
+    NtrkPixel = 0;
     double vzmax = -999;
     int nmax = 0;
     
@@ -383,7 +397,7 @@ iSetup)
     }
     
     //ntrk online full
-    NtrkFull = -1;
+    NtrkFull = 0;
     NvtxTrkFull = -1;
     HLTLeadingPt = -1;
     HLTVtxX = -999;
@@ -481,7 +495,17 @@ iSetup)
     {
         ETT = L1EtSum->begin()->pt();
     }
-
+    
+    HFsumET = -1;
+    
+    if(missingET.isValid())
+    {
+        for (reco::CaloMETCollection::const_iterator itMET = missingET->begin();itMET != missingET->end();++itMET)
+        {
+            HFsumET = itMET->sumEt();
+        }
+    }
+    
     HLTeffTree->Fill();
 }
 
@@ -497,6 +521,9 @@ HLTTree::beginJob()
 
     HLTeffTree = fs->make< TTree>("HLTeff","HLTeff");
     
+    HLTeffTree->Branch("Run",&HLT_Run);
+    HLTeffTree->Branch("Event",&HLT_Event);
+    HLTeffTree->Branch("LumiBlock",&HLT_LumiBlock);
     HLTeffTree->Branch("Ntrkoffline",&Ntrkoffline);
     HLTeffTree->Branch("NtrkFull",&NtrkFull);
     HLTeffTree->Branch("NtrkPixel",&NtrkPixel);
@@ -513,7 +540,7 @@ HLTTree::beginJob()
     HLTeffTree->Branch("NvtxHLT",&NvtxHLT);
     HLTeffTree->Branch("OfflineLeadingPt",&OfflineLeadingPt);
     HLTeffTree->Branch("HLTLeadingPt",&HLTLeadingPt);
-
+    HLTeffTree->Branch("HFsumET",&HFsumET);
 }
 
 // ------------ method called once each job just after ending the event

@@ -15,20 +15,21 @@
 
 void HLTeff_HighPt()
 {
-    TFile* file0 = TFile::Open("HLTTree.root");
+    TFile* file0 = TFile::Open("HLTeff.root");
     
     //Trigger threshold
     float PtThreshold[2] = {8,16};
-    int MultiplicityThreshold[2] = {100,120};
+    int MultiplicityThreshold = 110;
+    float HFSumThreshold = 55;
     int NPt = 2;
-    int NMult = 2;
     
     //initialize eff plots
-    int Nplot = 2+2;
+    int Nplot = 2;
     TH1D* h = new TH1D("","",60,0,60);
     TH1D* hFull = (TH1D*)h.Clone();
-    TH1D* hHMThres1[100];
-    TH1D* hHMThres2[100];
+    TH1D* hFullHFsum = (TH1D*)h.Clone();
+    TH1D* hHMThres1[100]; //HM+HighPt
+    TH1D* hHMThres2[100]; //HFsum+HighPt
     for(int i=0;i<Nplot;i++)
     {
         hHMThres1[i] = (TH1D*)h.Clone();
@@ -49,14 +50,18 @@ void HLTeff_HighPt()
     int Ntrkoffline;
     int NtrkFull;
     double OfflineVtxZ;
+    double HLTVtxZ;
     double OfflineLeadingPt;
     double HLTLeadingPt;
+    double HFsumET;
     
     Tree->SetBranchAddress("Ntrkoffline",&Ntrkoffline);
     Tree->SetBranchAddress("NtrkFull",&NtrkFull);
     Tree->SetBranchAddress("OfflineVtxZ",&OfflineVtxZ);
+    Tree->SetBranchAddress("HLTVtxZ",&HLTVtxZ);
     Tree->SetBranchAddress("OfflineLeadingPt",&OfflineLeadingPt);
     Tree->SetBranchAddress("HLTLeadingPt",&HLTLeadingPt);
+    Tree->SetBranchAddress("HFsumET",&HFsumET);
     
     //loop for histograms
     int nentry = Tree->GetEntries();
@@ -68,24 +73,29 @@ void HLTeff_HighPt()
         
         if(fabs(OfflineVtxZ)>15) continue;
         
-        //fill Ntrkoffline distribution without any cut
+        //fill Ntrkoffline distribution without any cut for HM+HighPt
         if(Ntrkoffline>=120) hFull->Fill(OfflineLeadingPt);
-        //fill Ntrkoffline distribution with cuts
-        if(NtrkFull>=MultiplicityThreshold[0])
+        //fill Ntrkoffline distribution with cuts for HM+HighPt
+        if(NtrkFull>=MultiplicityThreshold)
         {
             for(int j=0;j<NPt;j++)
             {
+                if(fabs(HLTVtxZ)>15) continue;
                 if(HLTLeadingPt<PtThreshold[j]) continue;
                 if(Ntrkoffline<120) continue;
                 hHMThres1[j]->Fill(OfflineLeadingPt);
             }
         }
-        if(NtrkFull>=MultiplicityThreshold[1])
+        
+        //fill Ntrkoffline distribution without any cut for HFsum+HighPt
+        if(HFsumET>HFSumThreshold) hFullHFsum->Fill(OfflineLeadingPt);
+        //fill Ntrkoffline distribution with cuts for HFsum+HighPt
+        if(HFsumET>HFSumThreshold)
         {
             for(int j=0;j<NPt;j++)
             {
+                if(fabs(HLTVtxZ)>15) continue;
                 if(HLTLeadingPt<PtThreshold[j]) continue;
-                if(Ntrkoffline<120) continue;
                 hHMThres2[j]->Fill(OfflineLeadingPt);
             }
         }
@@ -95,12 +105,12 @@ void HLTeff_HighPt()
     for(int i=0;i<NPt;i++)
     {
         grHMThres1[i]->Divide(hHMThres1[i],hFull);
-        grHMThres2[i]->Divide(hHMThres2[i],hFull);
+        grHMThres2[i]->Divide(hHMThres2[i],hFullHFsum);
     }
     
     //plot eff turn-ons
     TH1D* HLTeff = new TH1D("HLTeff","HLTeff",60,0,60);
-    HLTeff->GetXaxis()->SetTitle("Ntrkoffline");
+    HLTeff->GetXaxis()->SetTitle("pT_{offline}^{Leading}");
     HLTeff->GetYaxis()->SetTitle("HLT eff");
     HLTeff->SetTitle("");
    
@@ -114,14 +124,14 @@ void HLTeff_HighPt()
     l2->SetLineStyle(7);
     
     //create canvas
-    TCanvas* c1 = new TCanvas("c1","c1",600,600);
-    TCanvas* c2 = new TCanvas("c2","c2",600,600);
+    TCanvas* c1 = new TCanvas("HM","HM",600,600);
+    TCanvas* c2 = new TCanvas("HFsum","HFsum",600,600);
     
-    //HM threshold1 eff
+    //HM+HighPt eff
     c1->cd();
     HLTeff->Draw();
     TLegend* leg = new TLegend(0.7,0.7,0.9,0.9);
-    leg->AddEntry(grHMThres1[i],Form("Ntrkonline>=%d",MultiplicityThreshold[0]),"");
+    leg->AddEntry(grHMThres1[i],Form("Ntrkonline>=%d",MultiplicityThreshold),"");
     leg->SetFillStyle(0);
     for(int i=0;i<NPt;i++)
     {
@@ -135,11 +145,11 @@ void HLTeff_HighPt()
     l1->Draw("LSAME");
     l2->Draw("LSAME");
     
-    //HLT eff
+    //HFsum+HighPt eff
     c2->cd();
     HLTeff->Draw();
     TLegend* leg1 = new TLegend(0.7,0.7,0.9,0.9);
-    leg1->AddEntry(grHMThres2[i],Form("Ntrkonline>=%d",MultiplicityThreshold[1]),"");
+    leg1->AddEntry(grHMThres2[i],Form("HFsumET>%.1f",HFSumThreshold),"");
     leg1->SetFillStyle(0);
     for(int i=0;i<NPt;i++)
     {
