@@ -1,4 +1,3 @@
-
 //#include "makeMultiPanelCanvas.C"
 #include "TF1.h"
 #include "TH1.h"
@@ -19,6 +18,7 @@ void HLTeff_HighMultiplicity()
     TFile* file0 = TFile::Open("HLTTree_newEPOS_MB.root");
     
     //Trigger threshold
+    int PixelThreshold = 40;
     int TowerCountThreshold[3] = {0,62,74};
     int MultiplicityThreshold[5] = {120,150,185,220,250};
     int NTC = 3;
@@ -57,11 +57,13 @@ void HLTeff_HighMultiplicity()
     
     int Ntrkoffline;
     int NtrkFull;
+    int NtrkPixel
     double TowerCount;
     double OfflineVtxZ;
     double HLTVtxZ;
     
     Tree->SetBranchAddress("Ntrkoffline",&Ntrkoffline);
+    Tree->SetBranchAddress("NtrkPixel",&NtrkPixel);
     Tree->SetBranchAddress("NtrkFull",&NtrkFull);
     Tree->SetBranchAddress("TowerCount",&TowerCount);
     Tree->SetBranchAddress("OfflineVtxZ",&OfflineVtxZ);
@@ -89,6 +91,7 @@ void HLTeff_HighMultiplicity()
         for(int j=0;j<NMult;j++)
         {
             if(fabs(HLTVtxZ)>15) continue;
+            if(NtrkPixel<PixelThreshold) continue;
             if(NtrkFull<MultiplicityThreshold[j]) continue;
             hMult[j]->Fill(Ntrkoffline);
         }
@@ -96,6 +99,7 @@ void HLTeff_HighMultiplicity()
         {
             if(fabs(HLTVtxZ)>15) continue;
             if(TowerCount<=TowerCountThreshold[indexTowerCount[k]]) continue;
+            if(NtrkPixel<PixelThreshold) continue;
             if(NtrkFull<MultiplicityThreshold[indexMult[k]]) continue;
             hAll[k]->Fill(Ntrkoffline);
         }
