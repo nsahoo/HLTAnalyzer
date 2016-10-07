@@ -9,7 +9,7 @@ config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.psetName = 'YOUR_CONFIG'
-config.JobType.maxMemoryMB = 2500
+config.JobType.maxMemoryMB = 4000
 
 config.section_("Data")
 config.Data.useParent = True
@@ -24,3 +24,4 @@ config.Data.outputDatasetTag = 'YOUR_output_name'
 
 config.section_("Site")
 config.Site.storageSite = 'T2_CH_CERN'
+config.Site.whitelist = ['T2_US_MIT'] #MIT have larger RAM limit
