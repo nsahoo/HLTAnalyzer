@@ -57,7 +57,7 @@ void HLTeff_HighMultiplicity()
     
     int Ntrkoffline;
     int NtrkFull;
-    int NtrkPixel
+    int NtrkPixel;
     double TowerCount;
     double OfflineVtxZ;
     double HLTVtxZ;
@@ -84,7 +84,6 @@ void HLTeff_HighMultiplicity()
         //fill Ntrkoffline distribution with cuts
         for(int i=0;i<NTC;i++)
         {
-            if(fabs(HLTVtxZ)>15) continue;
             if(TowerCount<=TowerCountThreshold[i]) continue;
             hTowerCount[i]->Fill(Ntrkoffline);
         }

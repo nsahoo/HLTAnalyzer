@@ -1,4 +1,3 @@
-
 //#include "makeMultiPanelCanvas.C"
 #include "TF1.h"
 #include "TH1.h"
@@ -19,6 +18,7 @@ void HLTeff_HighPt()
     TFile* file0 = TFile::Open("HLTeff.root");
     
     //Trigger threshold
+    int PixelThreshold = 40;
     float PtThreshold[2] = {8,16};
     int MultiplicityThreshold = 110;
     float HFSumThreshold = 55;
@@ -50,6 +50,7 @@ void HLTeff_HighPt()
     
     int Ntrkoffline;
     int NtrkFull;
+    int NtrkPixel;
     double OfflineVtxZ;
     double HLTVtxZ;
     double OfflineLeadingPt;
@@ -57,6 +58,7 @@ void HLTeff_HighPt()
     double HFsumET;
     
     Tree->SetBranchAddress("Ntrkoffline",&Ntrkoffline);
+    Tree->SetBranchAddress("NtrkPixel",&NtrkPixel);
     Tree->SetBranchAddress("NtrkFull",&NtrkFull);
     Tree->SetBranchAddress("OfflineVtxZ",&OfflineVtxZ);
     Tree->SetBranchAddress("HLTVtxZ",&HLTVtxZ);
@@ -77,7 +79,7 @@ void HLTeff_HighPt()
         //fill Ntrkoffline distribution without any cut for HM+HighPt
         if(Ntrkoffline>=120) hFull->Fill(OfflineLeadingPt);
         //fill Ntrkoffline distribution with cuts for HM+HighPt
-        if(NtrkFull>=MultiplicityThreshold)
+        if(NtrkFull>=MultiplicityThreshold && NtrkPixel>=PixelThreshold)
         {
             for(int j=0;j<NPt;j++)
             {
