@@ -119,6 +119,7 @@ private:
     int NvtxHLT;
     double OfflineLeadingPt;
     double HLTLeadingPt;
+    double HLTCandLeadingPt;
     double HFsumET;
     
     //cuts for HighMultiplicity
@@ -126,8 +127,9 @@ private:
     double max_Pt_; // max pt cut for number of tracks at HLT
     double max_Eta_; // max eta cut for number of tracks at HLT
     double max_Vz_; // max vz cut for number of tracks at HLT
-    double min_sep_; // minimum separation in z of track-vertex in phi-eta for pixel tracks
-    double min_sep_full_; // minimum separation in z of track-vertex in phi-eta for full tracks
+    double min_sep_; // minimum separation in z of track-vertex for pixel tracks
+    double min_sep_full_; // minimum separation in z of track-vertex for full tracks
+    double min_sep_highpt_; // minimum separation in z of track-vertex for full track and high pT
     
     //cuts for HighPt track
     double pTerr_offline_;
@@ -143,6 +145,7 @@ private:
     edm::InputTag pixelTracks_;
     edm::InputTag fullVertices_;
     edm::InputTag fullTracks_;
+    edm::InputTag fullTrackCands_;
     edm::InputTag HLTTrack_;
     
     edm::EDGetTokenT<reco::VertexCollection> tok_offlinePV_;
@@ -153,6 +156,7 @@ private:
     
     edm::EDGetTokenT<reco::VertexCollection> tok_onlineFullVtx_;
     edm::EDGetTokenT<reco::RecoChargedCandidateCollection> tok_onlineFullTrk_;
+    edm::EDGetTokenT<reco::RecoChargedCandidateCollection> tok_HLTTrkCand_;
     edm::EDGetTokenT<reco::TrackCollection> tok_HLTTrk_;
     
     edm::EDGetTokenT<l1t::EtSumBxCollection> tok_EtSum_Stage2_;
@@ -181,6 +185,7 @@ HLTTree::HLTTree(const edm::ParameterSet& iConfig)
     max_Vz_ = iConfig.getUntrackedParameter<double>("max_Vz");
     min_sep_ = iConfig.getUntrackedParameter<double>("min_sep");
     min_sep_full_ = iConfig.getUntrackedParameter<double>("min_sep_full");
+    min_sep_highpt_ = iConfig.getUntrackedParameter<double>("min_sep_highpt");
     
     pTerr_offline_ = iConfig.getUntrackedParameter<double>("pTerr_offline");
     pTerr_HLT_ = iConfig.getUntrackedParameter<double>("pTerr_HLT");
@@ -206,6 +211,7 @@ HLTTree::HLTTree(const edm::ParameterSet& iConfig)
     pixelTracks_ = iConfig.getParameter<edm::InputTag>("PixelTracks");
     fullVertices_ = iConfig.getParameter<edm::InputTag>("FullVertices");
     fullTracks_ = iConfig.getParameter<edm::InputTag>("FullTracks");
+    fullTrackCands_ = iConfig.getParameter<edm::InputTag>("FullTrackCands");
     HLTTrack_ = iConfig.getParameter<edm::InputTag>("HLTTrack");
 
     tok_offlinePV_ = consumes<reco::VertexCollection>(edm::InputTag("offlinePrimaryVertices"));
@@ -216,7 +222,8 @@ HLTTree::HLTTree(const edm::ParameterSet& iConfig)
     
     tok_onlineFullVtx_ = consumes<reco::VertexCollection>(fullVertices_);
     tok_onlineFullTrk_ = consumes<reco::RecoChargedCandidateCollection>(fullTracks_);
-    
+
+    tok_HLTTrkCand_ = consumes<reco::RecoChargedCandidateCollection>(fullTrackCands_);
     tok_HLTTrk_ = consumes<reco::TrackCollection>(HLTTrack_);
     
     tok_EtSum_Stage2_ = consumes<l1t::EtSumBxCollection>(edm::InputTag("hltCaloStage2Digis","EtSum"));
@@ -266,6 +273,9 @@ iSetup)
     
     edm::Handle<reco::RecoChargedCandidateCollection> trackCollectionFull;
     iEvent.getByToken(tok_onlineFullTrk_,trackCollectionFull);
+    
+    edm::Handle<reco::RecoChargedCandidateCollection> trackCandFull;
+    iEvent.getByToken(tok_HLTTrkCand_,trackCandFull);
 
     edm::Handle<reco::TrackCollection> tracksHLT;
     iEvent.getByToken(tok_HLTTrk_, tracksHLT);
@@ -400,14 +410,15 @@ iSetup)
     NtrkFull = 0;
     NvtxTrkFull = -1;
     HLTLeadingPt = -1;
+    HLTCandLeadingPt = -1;
     HLTVtxX = -999;
     HLTVtxY = -999;
     HLTVtxZ = -999;
     NvtxHLT = -1;
     int   nmax_full = 0;
-    double HLTVtxXerr = -999;
-    double HLTVtxYerr = -999;
-    double HLTVtxZerr = -999;
+    double HLTVtxXerr = 0;
+    double HLTVtxYerr = 0;
+    double HLTVtxZerr = 0;
     double vxmax_full = -999;
     double vymax_full = -999;
     double vzmax_full = -999;
@@ -473,7 +484,7 @@ iSetup)
                     double dzerror = sqrt(trk.dzError()*trk.dzError()+HLTVtxZerr*HLTVtxZerr);
                     double dxyerror = sqrt(trk.d0Error()*trk.d0Error()+HLTVtxXerr*HLTVtxYerr);
                     
-                    if(!trk.quality(reco::TrackBase::highPurity)) continue;
+                    //if(!trk.quality(reco::TrackBase::highPurity)) continue;
                     if(fabs(trk.ptError())/trk.pt()>pTerr_HLT_) continue;
                     if(fabs(dzvtx/dzerror) > DCA_HLT_) continue;
                     if(fabs(dxyvtx/dxyerror) > DCA_HLT_) continue;
@@ -482,7 +493,25 @@ iSetup)
                     
                     if(trk.numberOfValidHits()<nHit_HLT_) continue;
                     
+                    if(fabs(trk.vz()-vzmax) > min_sep_highpt_) continue;
+                    
                     if(trk.pt()>HLTLeadingPt) HLTLeadingPt = trk.pt();
+                }
+            }
+            
+            if(trackCandFull.isValid())
+            {
+                const reco::RecoChargedCandidateCollection * tracks = trackCandFull.product();
+                reco::RecoChargedCandidateCollection::const_iterator tracksItr;
+                for (tracksItr=tracks->begin(); tracksItr!=tracks->end(); ++tracksItr)
+                {
+                    double eta = tracksItr->eta();
+                    if(fabs(eta) > max_Eta_) continue;
+                    double vz = tracksItr->vz();
+                    if(fabs(vz-vzmax) > min_sep_highpt_) continue;
+                    
+                    double pt  = tracksItr->pt();
+                    if(pt>HLTCandLeadingPt) HLTCandLeadingPt = pt;
                 }
             }
         }
@@ -540,6 +569,7 @@ HLTTree::beginJob()
     HLTeffTree->Branch("NvtxHLT",&NvtxHLT);
     HLTeffTree->Branch("OfflineLeadingPt",&OfflineLeadingPt);
     HLTeffTree->Branch("HLTLeadingPt",&HLTLeadingPt);
+    HLTeffTree->Branch("HLTCandLeadingPt",&HLTCandLeadingPt);
     HLTeffTree->Branch("HFsumET",&HFsumET);
 }
 
