@@ -247,7 +247,7 @@ void HLTeff_HighPt()
     
     //HM+HighPt HLT eff
     c5->cd();
-    HLTeff->Draw();
+    Fulleff->Draw();
     for(int i=0;i<NPt;i++)
     {
         grHMFullThres1[i]->SetMarkerColor(i+1);
@@ -261,7 +261,7 @@ void HLTeff_HighPt()
     
     //HFsum+HighPt HLT eff
     c6->cd();
-    HLTeff->Draw();
+    Fulleff->Draw();
     for(int i=0;i<NPt;i++)
     {
         grHMFullThres2[i]->SetMarkerColor(i+1);
