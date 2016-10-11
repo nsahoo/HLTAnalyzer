@@ -75,7 +75,7 @@ void HLTeff_HighMultiplicity()
     {
         Tree->GetEntry(it);
         
-        if(it%5000==0) cout<<"processing "<<it<<"th event"<<endl;
+        if(it%10000==0) cout<<"processing "<<it<<"/"<<nentry<<" event"<<endl;
         
         if(fabs(OfflineVtxZ)>15) continue;
         
