@@ -16,14 +16,14 @@
 
 void HLTeff_HighPt()
 {
-    TFile* file0 = TFile::Open("HLTTree_newEPOS_MB.root");
+    TFile* file0 = TFile::Open("HLTTree_newEPOS_MB_noJEC.root");
     
     //Trigger threshold
     int PixelThreshold = 40;
     int MultiplicityThreshold = 110;
     float HFSumThreshold = 55;
     float L1JetThreshold = 12;
-    float PtThreshold[2] = {8,16};
+    float PtThreshold[2] = {8,20};
     int NPt = 2;
     
     //initialize eff plots
@@ -165,8 +165,8 @@ void HLTeff_HighPt()
     L1eff->GetYaxis()->SetTitle("L1 eff");
     L1eff->SetTitle("");
    
-    TH1D* Fulleff = new TH1D("Fulleff","Fulleff",350,0,350);
-    Fulleff->GetXaxis()->SetTitle("Ntrkoffline");
+    TH1D* Fulleff = new TH1D("Fulleff","Fulleff",60,0,60);
+    Fulleff->GetXaxis()->SetTitle("pT_{offline}^{Leading}");
     Fulleff->GetYaxis()->SetTitle("L1+HLT eff");
     Fulleff->SetTitle("");
     
@@ -175,7 +175,7 @@ void HLTeff_HighPt()
     l->SetLineStyle(3);
     
     TLine* l1 = new TLine(8,0,8,1.05);
-    TLine* l2 = new TLine(16,0,16,1.05);
+    TLine* l2 = new TLine(20,0,20,1.05);
     l1->SetLineStyle(7);
     l2->SetLineStyle(7);
     
@@ -261,7 +261,7 @@ void HLTeff_HighPt()
     
     //HFsum+HighPt HLT eff
     c6->cd();
-    Fulleff->Draw();
+    HLTeff->Draw();
     for(int i=0;i<NPt;i++)
     {
         grHMFullThres2[i]->SetMarkerColor(i+1);
