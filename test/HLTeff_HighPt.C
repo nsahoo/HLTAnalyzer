@@ -23,7 +23,7 @@ void HLTeff_HighPt()
     int MultiplicityThreshold = 110;
     float HFSumThreshold = 55;
     float L1JetThreshold = 12;
-    float PtThreshold[2] = {8,20};
+    float PtThreshold[2] = {8,16};
     int NPt = 2;
     
     //initialize eff plots
@@ -118,10 +118,10 @@ void HLTeff_HighPt()
             }
         }
         //fill LeadingPt distribution with L1 jet for HM+HighPt
-        if(Ntrkoffline>=120 && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet12==1 && fabs(HLTVtxZ)<=15) hHMJet->Fill(OfflineLeadingPt);
+        if(Ntrkoffline>=120 && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet8==1 && fabs(HLTVtxZ)<=15) hHMJet->Fill(OfflineLeadingPt);
         //fill leadingpt distribution for full eff
         if(Ntrkoffline>=120 && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[0]) hHMFullThres1[0]->Fill(OfflineLeadingPt);
-        if(Ntrkoffline>=120 && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[1] && HLT_L1SingleJet12==1) hHMFullThres1[1]->Fill(OfflineLeadingPt);
+        if(Ntrkoffline>=120 && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[1] && HLT_L1SingleJet8==1) hHMFullThres1[1]->Fill(OfflineLeadingPt);
         
         //fill LeadingPt distribution without any cut for HFsum+HighPt
         if(HFsumET>HFSumThreshold) hFullHFsum->Fill(OfflineLeadingPt);
@@ -136,10 +136,10 @@ void HLTeff_HighPt()
             }
         }
         //fill LeadingPt distribution with L1 jet for HFsum+HighPt
-        if(HFsumET>HFSumThreshold && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet12==1 && fabs(HLTVtxZ)<=15) hHFJet->Fill(OfflineLeadingPt);
+        if(HFsumET>HFSumThreshold && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet8==1 && fabs(HLTVtxZ)<=15) hHFJet->Fill(OfflineLeadingPt);
         //fill leadingpt distribution for full eff
         if(HFsumET>HFSumThreshold && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[0]) hHMFullThres2[0]->Fill(OfflineLeadingPt);
-        if(HFsumET>HFSumThreshold && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet12==1 && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[1]) hHMFullThres2[1]->Fill(OfflineLeadingPt);
+        if(HFsumET>HFSumThreshold && Run==HLT_Run && Event==HLT_Event && LumiBlock==HLT_LumiBlock && HLT_L1SingleJet8==1 && fabs(HLTVtxZ)<=15 && HLTLeadingPt>PtThreshold[1]) hHMFullThres2[1]->Fill(OfflineLeadingPt);
         
     }
     
@@ -175,7 +175,7 @@ void HLTeff_HighPt()
     l->SetLineStyle(3);
     
     TLine* l1 = new TLine(8,0,8,1.05);
-    TLine* l2 = new TLine(20,0,20,1.05);
+    TLine* l2 = new TLine(16,0,16,1.05);
     l1->SetLineStyle(7);
     l2->SetLineStyle(7);
     
