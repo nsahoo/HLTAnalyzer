@@ -484,7 +484,7 @@ iSetup)
                     double dzerror = sqrt(trk.dzError()*trk.dzError()+HLTVtxZerr*HLTVtxZerr);
                     double dxyerror = sqrt(trk.d0Error()*trk.d0Error()+HLTVtxXerr*HLTVtxYerr);
                     
-                    //if(!trk.quality(reco::TrackBase::highPurity)) continue;
+                    if(!trk.quality(reco::TrackBase::highPurity)) continue;
                     if(fabs(trk.ptError())/trk.pt()>pTerr_HLT_) continue;
                     if(fabs(dzvtx/dzerror) > DCA_HLT_) continue;
                     if(fabs(dxyvtx/dxyerror) > DCA_HLT_) continue;
