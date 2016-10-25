@@ -465,7 +465,7 @@ iSetup)
                     double pt  = tracksItr->pt();
                     if(pt < min_Pt_ || pt > max_Pt_) continue;
                     double vz = tracksItr->vz();
-                    if(fabs(vz-vzmax) > min_sep_full_) continue;
+                    if(fabs(vz-vzmax_full) > min_sep_full_) continue;
                     
                     NtrkFull++;
                 }
@@ -493,7 +493,7 @@ iSetup)
                     
                     if(trk.numberOfValidHits()<nHit_HLT_) continue;
                     
-                    if(fabs(trk.vz()-vzmax) > min_sep_highpt_) continue;
+                    if(fabs(trk.vz()-vzmax_full) > min_sep_highpt_) continue;
                     
                     if(trk.pt()>HLTLeadingPt) HLTLeadingPt = trk.pt();
                 }
