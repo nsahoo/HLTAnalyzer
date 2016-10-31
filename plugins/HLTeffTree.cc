@@ -109,6 +109,7 @@ private:
     int NvtxTrkOffline;
     int NvtxTrkFull;
     double ETT;
+    double TowerCount;
     double OfflineVtxX;
     double OfflineVtxY;
     double OfflineVtxZ;
@@ -519,10 +520,16 @@ iSetup)
     
     //ETT
     ETT = -1;
-    
+    TowerCount = -1;
+
     if(L1EtSum.isValid())
     {
         ETT = L1EtSum->begin()->pt();
+	for (auto j = L1EtSum->begin(); j != L1EtSum->end(); ++j) 
+	{
+		if (j->getType()==l1t::EtSum::kTotalEt) {cout<<"Event: "<<HLT_Event<<", ET: "<<j->pt()<<", Type: "<<j->getType()<<endl; ETT = j->pt();}
+		if (j->getType()==l1t::EtSum::kTowerCount) {cout<<"Event: "<<HLT_Event<<", ET: "<<j->pt()<<", Type: "<<j->getType()<<endl; TowerCount = j->pt();}
+	}
     }
     
     HFsumET = -1;
@@ -558,7 +565,8 @@ HLTTree::beginJob()
     HLTeffTree->Branch("NtrkPixel",&NtrkPixel);
     HLTeffTree->Branch("NvtxTrkOffline",&NvtxTrkOffline);
     HLTeffTree->Branch("NvtxTrkFull",&NvtxTrkFull);
-    HLTeffTree->Branch("TowerCount",&ETT);
+    HLTeffTree->Branch("ETT",&ETT);
+    HLTeffTree->Branch("TowerCount",&TowerCount);
     HLTeffTree->Branch("OfflineVtxX",&OfflineVtxX);
     HLTeffTree->Branch("OfflineVtxY",&OfflineVtxY);
     HLTeffTree->Branch("OfflineVtxZ",&OfflineVtxZ);
