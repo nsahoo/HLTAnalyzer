@@ -18,7 +18,7 @@ void HLTeff_HighMultiplicity()
     TFile* file0 = TFile::Open("HLTTree_newEPOS_MB.root");
     
     //Trigger threshold
-    int PixelThreshold = 40;
+    int PixelThreshold = 75;
     int TowerCountThreshold[3] = {0,62,74};
     int MultiplicityThreshold[5] = {120,150,185,220,250};
     int NTC = 3;

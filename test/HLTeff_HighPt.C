@@ -19,7 +19,7 @@ void HLTeff_HighPt()
     TFile* file0 = TFile::Open("HLTTree_newEPOS_MB_noJEC.root");
     
     //Trigger threshold
-    int PixelThreshold = 40;
+    int PixelThreshold = 75;
     int MultiplicityThreshold = 110;
     float HFSumThreshold = 55;
     float L1JetThreshold = 12;
