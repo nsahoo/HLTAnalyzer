@@ -524,21 +524,38 @@ iSetup)
 
     if(L1EtSum.isValid())
     {
-        ETT = L1EtSum->begin()->pt();
-	for (auto j = L1EtSum->begin(); j != L1EtSum->end(); ++j) 
+	for(int iBx = L1EtSum->getFirstBX(); iBx <= L1EtSum->getLastBX(); ++iBx) {
+	for (std::vector<l1t::EtSum>::const_iterator j = L1EtSum->begin(iBx); j != L1EtSum->end(iBx); ++j) 
 	{
 		if (j->getType()==l1t::EtSum::kTotalEt) 
 		{
-		//cout<<"Event: "<<HLT_Event<<", ET: "<<j->pt()<<", Type: "<<j->getType()<<endl; 
-		ETT = j->pt();
+		//cout<<"Event: "<<HLT_Event<<", ET: "<<j->et()<<", Type: "<<j->getType()<<endl; 
+		ETT = j->et();
 		}
 		if (j->getType()==l1t::EtSum::kTowerCount) 
 		{
-		//cout<<"Event: "<<HLT_Event<<", ET: "<<j->pt()<<", Type: "<<j->getType()<<endl; 
-		TowerCount = j->pt();
+		//cout<<"Event: "<<HLT_Event<<", TC: "<<j->hwPt()<<", Type: "<<j->getType()<<endl; 
+		TowerCount = j->hwPt();
 		}
 	}
+	}
     }
+
+/*if (L1EtSum.isValid()) {
+    int il1stage2ets = 0;
+    typedef std::vector<l1t::EtSum>::const_iterator l1cand;
+    for(int iBx = L1EtSum->getFirstBX(); iBx <= L1EtSum->getLastBX(); ++iBx) { 
+      for (l1cand etsItr=L1EtSum->begin(iBx); etsItr!=L1EtSum->end(iBx); ++etsItr) {
+        cout<<"et: "<<etsItr->et()<<endl;
+        cout<<"phi: "<<etsItr->phi()<<endl;
+        cout<<"hwPt:"<<etsItr->hwPt()<<endl;
+        cout<<"hwPhi: "<<etsItr->hwPhi()<<endl;
+        cout<<"Type: "<<etsItr->getType()<<endl;
+        cout<<"BX: "<<iBx<<endl;
+        il1stage2ets++;
+      }
+    }
+  }*/
     
     HFsumET = -1;
     
