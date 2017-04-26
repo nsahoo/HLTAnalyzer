@@ -227,7 +227,7 @@ HLTTree::HLTTree(const edm::ParameterSet& iConfig)
     tok_HLTTrkCand_ = consumes<reco::RecoChargedCandidateCollection>(fullTrackCands_);
     tok_HLTTrk_ = consumes<reco::TrackCollection>(HLTTrack_);
     
-    tok_EtSum_Stage2_ = consumes<l1t::EtSumBxCollection>(edm::InputTag("hltCaloStage2Digis","EtSum"));
+    tok_EtSum_Stage2_ = consumes<l1t::EtSumBxCollection>(edm::InputTag("hltGtStage2Digis","EtSum"));
     tok_HFSum_ = consumes<reco::CaloMETCollection>(edm::InputTag("hltMetForHf"));
 }
 
